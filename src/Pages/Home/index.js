@@ -1,0 +1,41 @@
+import React from 'react';
+import { Route, Switch, useRouteMatch } from 'react-router';
+import { Col, Grid, Row } from 'rsuite';
+import RoomsProvider from '../../Context/Rooms.context';
+import { useMediaQuery } from '../../misc/custom.hooks';
+import Sidebar from '../Sidebar';
+import Chat from './Chat';
+
+export default function Home() {
+  const isDesktop = useMediaQuery('(min-width: 992px)');
+  const { isExact } = useRouteMatch();
+
+  const canRenderSidebar = isDesktop || isExact;
+
+  return (
+    <RoomsProvider>
+      <Grid fluid className="h-100">
+        <Row className="h-100">
+          {canRenderSidebar && (
+            <Col className="h-100" xs={24} md={8}>
+              <Sidebar />
+            </Col>
+          )}
+
+          <Switch>
+            <Route exact path="/chat/:chatId">
+              <Col xs={24} md={16} className="h-100">
+                <Chat />
+              </Col>
+            </Route>
+            {isDesktop && (
+              <Col xs={24} md={16} className="h-100">
+                <h6 className="text-center mt-page">Please select chat</h6>
+              </Col>
+            )}
+          </Switch>
+        </Row>
+      </Grid>
+    </RoomsProvider>
+  );
+}
