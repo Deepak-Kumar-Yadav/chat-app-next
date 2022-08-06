@@ -64,12 +64,12 @@ export default function Bottom() {
           placeholder="Write a new message here..."
           value={input}
           onChange={onInputChange}
+          onKeyDown={onKeyDown}
         />
         <InputGroup.Button
           color="blue"
           appearance="primary"
           onClick={onSendClick}
-          onKeyDown={onKeyDown}
           disabled={isLoading}
         >
           <Icon icon="send" />
