@@ -2,12 +2,15 @@ import React from 'react';
 import { Button } from 'rsuite';
 import TimeAgo from 'timeago-react';
 import { useCurrentRoom } from '../../../Context/current-room.context';
+import { useHover } from '../../../misc/custom.hooks';
 import { auth } from '../../../misc/firebase';
 import PresenceDot from '../../PresenceDot';
 import ProfileAvatar from '../../ProfileAvatar';
 import ProfileInfoBtnModal from './ProfileInfoBtnModal';
 
 export default function MessageItem({ message, handleAdmin }) {
+  const [selfRef, isHovered] = useHover();
+
   const { author, createdAt, text } = message;
   const isAdmin = useCurrentRoom(v => v.isAdmin);
   const admins = useCurrentRoom(v => v.admins);
@@ -17,7 +20,10 @@ export default function MessageItem({ message, handleAdmin }) {
   const canGrantAdmin = isAdmin && !isAuthor;
 
   return (
-    <li className="padded mb-1">
+    <li
+      className={`padded mb-1 cursor-pointer ${isHovered ? 'bg-black-02' : ''}`}
+      ref={selfRef}
+    >
       <div className="d-flex align-item-center font-border mb-1">
         <PresenceDot uid={author.uid} />
         <ProfileAvatar
