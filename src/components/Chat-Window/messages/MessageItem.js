@@ -7,7 +7,20 @@ import { auth } from '../../../misc/firebase';
 import PresenceDot from '../../PresenceDot';
 import ProfileAvatar from '../../ProfileAvatar';
 import IconBtnControl from './IconBtnControl';
+import ImgBtnModal from './ImgBtnModal';
 import ProfileInfoBtnModal from './ProfileInfoBtnModal';
+
+const renderFileMessage = file => {
+  if (file.contentType.includes('image')) {
+    return (
+      <div className="height-220">
+        <ImgBtnModal src={file.url} fileName={file.name} />
+      </div>
+    );
+  }
+
+  return <a href={file.url}>Download {file.name}</a>;
+};
 
 export default memo(function MessageItem({
   message,
@@ -20,7 +33,7 @@ export default memo(function MessageItem({
   const isMobile = useMediaQuery('(max-width : 992px)');
   const canShowIcons = isMobile || isHovered;
 
-  const { author, createdAt, text, likes, likeCount } = message;
+  const { author, createdAt, text, likes, likeCount, file } = message;
   const isAdmin = useCurrentRoom(v => v.isAdmin);
   const admins = useCurrentRoom(v => v.admins);
 
@@ -78,7 +91,8 @@ export default memo(function MessageItem({
         )}
       </div>
       <div>
-        <span className="word-barel-all">{text}</span>
+        {text && <span className="word-barel-all">{text}</span>}
+        {file && renderFileMessage(file)}
       </div>
     </li>
   );
