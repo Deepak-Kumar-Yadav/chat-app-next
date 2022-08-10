@@ -55,7 +55,7 @@ export default function Messages() {
     await messageRef.transaction(msg => {
       if (msg) {
         if (msg.likes && msg.likes[uid]) {
-          msg.likesCount -= 1;
+          msg.likeCount -= 1;
           msg.likes[uid] = null;
           alertMsg = 'Like removed';
         } else {
@@ -72,6 +72,37 @@ export default function Messages() {
     Alert.info(alertMsg, 3000);
   }, []);
 
+  const handleDelete = useCallback(
+    async msgId => {
+      // eslint-disable-next-line
+      if (!window.confirm('Delete this message')) {
+        return;
+      }
+      const isLast = messages[messages.length - 1].id === msgId;
+      const updates = {};
+      updates[`/messages/${msgId}`] = null;
+
+      if (isLast && messages.length > 1) {
+        updates[`/rooms/${chatId}/lastMessage`] = {
+          ...messages[messages.length - 2],
+          msgId: messages[messages.length - 2].id,
+        };
+      }
+
+      if (isLast && messages.length === 1) {
+        updates[`/rooms/${chatId}/lastMessage`] = null;
+      }
+
+      try {
+        await database.ref().update(updates);
+        Alert.info('Message has been deleted', 3000);
+      } catch (err) {
+        Alert.error(err.messgae, 3000);
+      }
+    },
+    [chatId, messages]
+  );
+
   return (
     <ul className="msg-list custom-scroll">
       {isChatEmpty && <li>No messages yet</li>}
@@ -82,6 +113,7 @@ export default function Messages() {
             message={msg}
             handleAdmin={handleAdmin}
             handleLike={handleLike}
+            handleDelete={handleDelete}
           />
         ))}
     </ul>

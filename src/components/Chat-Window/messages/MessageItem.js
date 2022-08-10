@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Button } from 'rsuite';
 import TimeAgo from 'timeago-react';
 import { useCurrentRoom } from '../../../Context/current-room.context';
@@ -9,7 +9,12 @@ import ProfileAvatar from '../../ProfileAvatar';
 import IconBtnControl from './IconBtnControl';
 import ProfileInfoBtnModal from './ProfileInfoBtnModal';
 
-export default function MessageItem({ message, handleAdmin, handleLike }) {
+export default memo(function MessageItem({
+  message,
+  handleAdmin,
+  handleLike,
+  handleDelete,
+}) {
   const [selfRef, isHovered] = useHover();
 
   const isMobile = useMediaQuery('(max-width : 992px)');
@@ -43,12 +48,13 @@ export default function MessageItem({ message, handleAdmin, handleLike }) {
           appearance="link"
           className="p-0 ml-1 text-black"
         >
-          {canGrantAdmin}
-          <Button block onClick={() => handleAdmin(author.uid)} color="blue">
-            {isMsgAuthorAdmin
-              ? 'Remove admin permission'
-              : 'Give admin permission'}
-          </Button>
+          {canGrantAdmin && (
+            <Button block onClick={() => handleAdmin(author.uid)} color="blue">
+              {isMsgAuthorAdmin
+                ? 'Remove admin permission'
+                : 'Give admin permission'}
+            </Button>
+          )}
         </ProfileInfoBtnModal>
         <TimeAgo
           datetime={createdAt}
@@ -62,10 +68,18 @@ export default function MessageItem({ message, handleAdmin, handleLike }) {
           onClick={() => handleLike(message.id)}
           badgeContent={likeCount}
         />
+        {isAuthor && (
+          <IconBtnControl
+            isVisible={canShowIcons}
+            iconName="close"
+            tooltip="Delete the message"
+            onClick={() => handleDelete(message.id)}
+          />
+        )}
       </div>
       <div>
         <span className="word-barel-all">{text}</span>
       </div>
     </li>
   );
-}
+});
